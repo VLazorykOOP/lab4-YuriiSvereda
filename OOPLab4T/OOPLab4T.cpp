@@ -72,9 +72,9 @@ public:
 
 	VectorDouble(int size, double inicialisated_value);
 	
-	//destructor
 	~VectorDouble();
 
+	//unary operations ++ --
 	VectorDouble& operator++ ()
 	{
 		for (int i = 0; i < this->size; i++) {
@@ -109,6 +109,18 @@ public:
 		return temp;
 	}
 
+	bool operator! () 
+	{
+		return size != 0;
+	}
+
+	VectorDouble& operator- () 
+	{
+		for (int i = 0; i < this->size; i++) {
+			this->vec[i] = -this->vec[i];
+		}
+		return *this;
+	}
 
 private:
 	double* vec;
@@ -144,13 +156,7 @@ VectorDouble::~VectorDouble() {
 	delete[]vec;
 }
 
-VectorDouble::VectorDouble& operator++ ()
-{
-	for (int i = 0; i < this->size; i++) {
-		++this->vec[i];
-	}
-	return *this;
-}
+
 
 
 /*Завдання 2. Варіанти задач. Побудувати асоційований клас збереження
