@@ -27,9 +27,9 @@ o перевантаження операцій (операції переван
 елементи якщо size не дорівнює – нулю, інакше false;
 • унарний арифметичний - (мінус) : повертає всі елементи масиву
 класу вектор з протилежним знаком;
-• присвоєння =: копіює вектор(перевантажити через функцію класу);
-• присвоєння з (перевантажити через функцію класу)*/
-/*o += - додаванням векторів;
+• присвоєння =: копіює вектор(перевантажити через функцію класу);*/
+/*• присвоєння з(перевантажити через функцію класу)
+o += - додаванням векторів;
 o -= - відніманням векторів;
 o *= - множення, вектора на число;
 o /= - ділення, вектора на число;
@@ -109,6 +109,7 @@ public:
 		return temp;
 	}
 
+	//
 	bool operator! () 
 	{
 		return size != 0;
@@ -121,6 +122,62 @@ public:
 		}
 		return *this;
 	}
+
+	VectorDouble& operator = (VectorDouble& other) 
+	{
+		this->size = other.size;
+		other.vec = new double[other.size];
+		for (int i = 0; i < other.size; i++) {
+			this->vec[i] = other.vec[i];
+		}
+		return *this;
+	}
+
+	VectorDouble& operator += (VectorDouble& other)
+	{
+		//int rezult_size;
+		//this->size >= other.size ? rezult_size = this->size : rezult_size = this->size;
+		if (this->size != other.size) {
+			cout << "ERROR += different sizes\n";
+		}
+		else {
+			for (int i = 0; i < this->size; i++) {
+				this->vec[i] += other.vec[i];
+			}
+		}
+		return *this;
+	}
+
+	VectorDouble& operator -= (VectorDouble& other)
+	{		
+		if (this->size != other.size) {
+			cout << "ERROR += different sizes\n";
+		}
+		else {
+			for (int i = 0; i < this->size; i++) {
+				this->vec[i] -= other.vec[i];
+			}
+		}
+		return *this;
+	}
+
+	VectorDouble& operator *= (int number)
+	{		
+		for (int i = 0; i < this->size; i++) {
+				this->vec[i] *= number;
+		}
+		return *this;
+	}
+
+	VectorDouble& operator /= (int number)
+	{
+		for (int i = 0; i < this->size; i++) {
+			this->vec[i] /= number;
+		}
+		return *this;
+	}
+
+	
 
 private:
 	double* vec;
