@@ -73,13 +73,41 @@ public:
 	VectorDouble(int size, double inicialisated_value);
 	
 	//destructor
-	~VectorDouble() {
-		delete[]vec;
+	~VectorDouble();
+
+	VectorDouble& operator++ ()
+	{
+		for (int i = 0; i < this->size; i++) {
+			++this->vec[i];
+		}
+		return *this;
 	}
 
-	friend void PreIncrement(VectorDouble& object);
+	VectorDouble& operator-- ()
+	{
+		for (int i = 0; i < this->size; i++) {
+			--this->vec[i];
+		}
+		return *this;
+	}
 
-	friend void PreDecrement(VectorDouble& object);
+	VectorDouble& operator++ ()
+	{
+		VectorDouble temp(*this);
+		for (int i = 0; i < this->size; i++) {
+			++this->vec[i];
+		}
+		return temp;
+	}
+
+	VectorDouble& operator-- ()
+	{
+		VectorDouble temp(*this);
+		for (int i = 0; i < this->size; i++) {
+			--this->vec[i];
+		}
+		return temp;
+	}
 
 
 private:
@@ -87,7 +115,7 @@ private:
 	int size;
 	short codeError;
 
-	//friend void PreInctement(VectorDouble& object);
+	
 };
 
 VectorDouble::VectorDouble()
@@ -112,18 +140,16 @@ VectorDouble::VectorDouble(int size, double inicialisated_value) :size(size)
 	}
 }
 
-void PreIncrement(VectorDouble& object)
-{
-	for (int i = 0; i < object.size; i++) {
-		object.vec[i]++;
-	}
+VectorDouble::~VectorDouble() {
+	delete[]vec;
 }
 
-void PreDecrement(VectorDouble& object)
+VectorDouble::VectorDouble& operator++ ()
 {
-	for (int i = 0; i < object.size; i++) {
-		object.vec[i]--;
+	for (int i = 0; i < this->size; i++) {
+		++this->vec[i];
 	}
+	return *this;
 }
 
 
