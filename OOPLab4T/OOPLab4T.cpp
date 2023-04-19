@@ -77,10 +77,17 @@ public:
 		delete[]vec;
 	}
 
+	friend void PreIncrement(VectorDouble& object);
+
+	friend void PreDecrement(VectorDouble& object);
+
+
 private:
 	double* vec;
 	int size;
 	short codeError;
+
+	//friend void PreInctement(VectorDouble& object);
 };
 
 VectorDouble::VectorDouble()
@@ -102,6 +109,20 @@ VectorDouble::VectorDouble(int size, double inicialisated_value) :size(size)
 	this->vec = new double[size];
 	for (int i = 0; i < size; i++) {
 		this->vec[i] = inicialisated_value;
+	}
+}
+
+void PreIncrement(VectorDouble& object)
+{
+	for (int i = 0; i < object.size; i++) {
+		object.vec[i]++;
+	}
+}
+
+void PreDecrement(VectorDouble& object)
+{
+	for (int i = 0; i < object.size; i++) {
+		object.vec[i]--;
 	}
 }
 
@@ -158,3 +179,7 @@ int main()
 //    if (chain == 3) chain = mainExample3();
 //
 //}
+
+void PreInctement(VectorDouble& object)
+{
+}
