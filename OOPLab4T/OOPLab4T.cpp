@@ -91,7 +91,7 @@ public:
 		return *this;
 	}
 
-	VectorDouble& operator++ ()
+	VectorDouble& operator++ (int value)
 	{
 		VectorDouble temp(*this);
 		for (int i = 0; i < this->size; i++) {
@@ -100,7 +100,7 @@ public:
 		return temp;
 	}
 
-	VectorDouble& operator-- ()
+	VectorDouble& operator-- (int value)
 	{
 		VectorDouble temp(*this);
 		for (int i = 0; i < this->size; i++) {
@@ -177,7 +177,9 @@ public:
 		return *this;
 	}
 
-	
+	friend istream& operator>>(istream& input, VectorDouble& vector);
+	friend ostream& operator<<(ostream& output, VectorDouble& vector);
+
 
 private:
 	double* vec;
@@ -213,8 +215,19 @@ VectorDouble::~VectorDouble() {
 	delete[]vec;
 }
 
+istream& operator>>(istream& input, VectorDouble& vector) {
+	for (int i = 0; i < vector.size; i++) {
+		input >> vector.vec[i];
+	}
+	return input;
+}
 
-
+ostream& operator<<(ostream& output, VectorDouble& vector) {
+	for (int i = 0; i < vector.size; i++) {
+		output << vector.vec[i] << '\t';
+	}
+	return output;
+}
 
 /*Завдання 2. Варіанти задач. Побудувати асоційований клас збереження
 двох сутностей. В завданні створити клас, який представляє собою
@@ -231,7 +244,9 @@ VectorDouble::~VectorDouble() {
 
 int main()
 {
-
+	VectorDouble a(5);
+	cin >> a;
+	cout << a;
 
 	return 0;
 }
@@ -269,6 +284,4 @@ int main()
 //
 //}
 
-void PreInctement(VectorDouble& object)
-{
-}
+
