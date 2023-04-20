@@ -62,6 +62,7 @@ o <=(менше рівне) для двох векторів.
 класу.*/
 
 
+
 class VectorDouble
 {
 public:
@@ -178,7 +179,96 @@ public:
 	}
 
 	friend istream& operator>>(istream& input, VectorDouble& vector);
-	friend ostream& operator<<(ostream& output, VectorDouble& vector);
+	friend ostream& operator<<(ostream& output, const VectorDouble& vector);
+
+	bool operator ==(const VectorDouble& other) 
+	{
+		if (this->size != other.size)
+			return false;
+		for (int i = 0; i < size; i++) {
+			if (this->vec[i] != other.vec[i])
+				return false;
+		}
+		return true;
+	}
+
+	bool operator !=(const VectorDouble& other) 
+	{
+		if (this->size != other.size)
+			return true;
+		for (int i = 0; i < size; i++) {
+			if (this->vec[i] != other.vec[i])
+				return true;
+		}
+		return false;
+	}
+
+	double& operator [](int value)
+	{
+		return this->vec[value];
+	}
+
+	bool operator >(const VectorDouble& other)
+	{
+		if (this->size != other.size) {
+			cout << "ERROR different sizes";
+			return false;
+		}
+		else {
+			for (int i = 0; i < size; i++) {
+				if (this->vec[i] <= other.vec[i])
+					return false;
+			}
+			return true;
+		}
+	}
+
+	bool operator >=(const VectorDouble& other)
+	{
+		if (this->size != other.size) {
+			cout << "ERROR different sizes";
+			return false;
+		}
+		else {
+			for (int i = 0; i < size; i++) {
+				if (this->vec[i] < other.vec[i])
+					return false;
+			}
+			return true;
+		}
+	}
+
+	bool operator <(const VectorDouble& other)
+	{
+		if (this->size != other.size) {
+			cout << "ERROR different sizes";
+			return false;
+		}
+		else {
+			for (int i = 0; i < size; i++) {
+				if (this->vec[i] >= other.vec[i])
+					return false;
+			}
+			return true;
+		}
+	}
+
+	bool operator <=(const VectorDouble& other)
+	{
+		if (this->size != other.size) {
+			cout << "ERROR different sizes";
+			return false;
+		}
+		else {
+			for (int i = 0; i < size; i++) {
+				if (this->vec[i] > other.vec[i])
+					return false;
+			}
+			return true;
+		}
+	}
+	
+
 
 
 private:
@@ -215,14 +305,16 @@ VectorDouble::~VectorDouble() {
 	delete[]vec;
 }
 
-istream& operator>>(istream& input, VectorDouble& vector) {
+istream& operator>>(istream& input, VectorDouble& vector) 
+{
 	for (int i = 0; i < vector.size; i++) {
 		input >> vector.vec[i];
 	}
 	return input;
 }
 
-ostream& operator<<(ostream& output, VectorDouble& vector) {
+ostream& operator<<(ostream& output, const VectorDouble& vector) 
+{
 	for (int i = 0; i < vector.size; i++) {
 		output << vector.vec[i] << '\t';
 	}
@@ -242,11 +334,14 @@ ostream& operator<<(ostream& output, VectorDouble& vector) {
 
 
 
+void Task1()
+{
+
+}
+
 int main()
 {
-	VectorDouble a(5);
-	cin >> a;
-	cout << a;
+	
 
 	return 0;
 }
