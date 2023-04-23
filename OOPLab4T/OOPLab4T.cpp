@@ -1,4 +1,5 @@
 ﻿#include<iostream>
+#include<limits>
 
 using namespace std;
 
@@ -61,8 +62,6 @@ o <=(менше рівне) для двох векторів.
 Передбачити можливість підрахунку числа об'єктів даного типу. Перевірити роботу цього
 класу.*/
 
-
-
 class VectorDouble
 {
 public:
@@ -72,10 +71,17 @@ public:
 	VectorDouble(int size);
 
 	VectorDouble(int size, double inicialisated_value);
+
+	VectorDouble(string rand_variable, int limit_size, int limit_element);
+
+	VectorDouble(const VectorDouble& other) : size(other.size), vec(new double[other.size]) {
+		for (int i = 0; i < this->size; i++) {
+			this->vec[i] = other.vec[i];
+		}
+	}
 	
 	~VectorDouble();
 
-	//unary operations ++ --
 	VectorDouble& operator++ ()
 	{
 		for (int i = 0; i < this->size; i++) {
@@ -87,30 +93,31 @@ public:
 	VectorDouble& operator-- ()
 	{
 		for (int i = 0; i < this->size; i++) {
-			--this->vec[i];
+			this->vec[i]--;
 		}
 		return *this;
 	}
 
-	VectorDouble& operator++ (int value)
+	VectorDouble& operator++ (int)
 	{
 		VectorDouble temp(*this);
 		for (int i = 0; i < this->size; i++) {
-			++this->vec[i];
+			this->vec[i]++;
 		}
+		memory_free_variable = false;
 		return temp;
 	}
 
-	VectorDouble& operator-- (int value)
+	VectorDouble& operator-- (int)
 	{
 		VectorDouble temp(*this);
 		for (int i = 0; i < this->size; i++) {
-			--this->vec[i];
+			this->vec[i]--;
 		}
+		memory_free_variable = false;
 		return temp;
 	}
 
-	//
 	bool operator! () 
 	{
 		return size != 0;
@@ -124,20 +131,24 @@ public:
 		return *this;
 	}
 
-	VectorDouble& operator = (VectorDouble& other) 
+	VectorDouble& operator = (const VectorDouble& other) 
 	{
-		this->size = other.size;
-		other.vec = new double[other.size];
-		for (int i = 0; i < other.size; i++) {
-			this->vec[i] = other.vec[i];
+		if (*this != other) {
+			if (this->vec != nullptr) {
+				delete[] this->vec;
+			}
+			this->size = other.size;
+			this->vec = new double[other.size];
+			for (int i = 0; i < other.size; i++) {
+				this->vec[i] = other.vec[i];
+			}
 		}
 		return *this;
 	}
 
-	VectorDouble& operator += (VectorDouble& other)
+
+	VectorDouble& operator += (const VectorDouble& other)
 	{
-		//int rezult_size;
-		//this->size >= other.size ? rezult_size = this->size : rezult_size = this->size;
 		if (this->size != other.size) {
 			cout << "ERROR += different sizes\n";
 		}
@@ -149,7 +160,7 @@ public:
 		return *this;
 	}
 
-	VectorDouble& operator -= (VectorDouble& other)
+	VectorDouble& operator -= (const VectorDouble& other)
 	{		
 		if (this->size != other.size) {
 			cout << "ERROR += different sizes\n";
@@ -203,84 +214,108 @@ public:
 		return false;
 	}
 
-	double& operator [](int value)
+	double& operator [](int index)
 	{
-		return this->vec[value];
+		if (index<0 || index>this->size) {
+			this->codeError = 2; //going beyond the array
+			this->Error_counter++;
+			index = 0;
+		}
+		return this->vec[index];
 	}
 
+	short GetSize() {
+		return this->size;
+	}
+	
 	bool operator >(const VectorDouble& other)
 	{
-		if (this->size != other.size) {
-			cout << "ERROR different sizes";
-			return false;
+		double this_modul = 0, other_modul = 0;
+		for (short i = 0; i < this->size; i++) {
+			this_modul += this->vec[i] * this->vec[i];
 		}
-		else {
-			for (int i = 0; i < size; i++) {
-				if (this->vec[i] <= other.vec[i])
-					return false;
-			}
+		this_modul = sqrt(this_modul);
+
+		for (short i = 0; i < other.size; i++) {
+			other_modul += other.vec[i] * other.vec[i];
+		}
+		other_modul = sqrt(other_modul);
+
+		if (this_modul > other_modul) {
 			return true;
 		}
+		return false;
 	}
 
 	bool operator >=(const VectorDouble& other)
 	{
-		if (this->size != other.size) {
-			cout << "ERROR different sizes";
-			return false;
+		double this_modul = 0, other_modul = 0;
+		for (short i = 0; i < this->size; i++) {
+			this_modul += this->vec[i] * this->vec[i];
 		}
-		else {
-			for (int i = 0; i < size; i++) {
-				if (this->vec[i] < other.vec[i])
-					return false;
-			}
+		this_modul = sqrt(this_modul);
+
+		for (short i = 0; i < other.size; i++) {
+			other_modul += other.vec[i] * other.vec[i];
+		}
+		other_modul = sqrt(other_modul);
+
+		if (this_modul >= other_modul) {
 			return true;
 		}
+		return false;
 	}
 
 	bool operator <(const VectorDouble& other)
 	{
-		if (this->size != other.size) {
-			cout << "ERROR different sizes";
-			return false;
+		double this_modul = 0, other_modul = 0;
+		for (short i = 0; i < this->size; i++) {
+			this_modul += this->vec[i] * this->vec[i];
 		}
-		else {
-			for (int i = 0; i < size; i++) {
-				if (this->vec[i] >= other.vec[i])
-					return false;
-			}
+		this_modul = sqrt(this_modul);
+
+		for (short i = 0; i < other.size; i++) {
+			other_modul += other.vec[i] * other.vec[i];
+		}
+		other_modul = sqrt(other_modul);
+
+		if (this_modul < other_modul) {
 			return true;
 		}
+		return false;
 	}
 
 	bool operator <=(const VectorDouble& other)
 	{
-		if (this->size != other.size) {
-			cout << "ERROR different sizes";
-			return false;
+		double this_modul = 0, other_modul = 0;
+		for (short i = 0; i < this->size; i++) {
+			this_modul += this->vec[i] * this->vec[i];
 		}
-		else {
-			for (int i = 0; i < size; i++) {
-				if (this->vec[i] > other.vec[i])
-					return false;
-			}
+		this_modul = sqrt(this_modul);
+
+		for (short i = 0; i < other.size; i++) {
+			other_modul += other.vec[i] * other.vec[i];
+		}
+		other_modul = sqrt(other_modul);
+
+		if (this_modul <= other_modul) {
 			return true;
 		}
+		return false;
 	}
-	
-
 
 
 private:
 	double* vec;
 	int size;
-	short codeError;
-
+	short codeError, Error_counter;
+	bool memory_free_variable = true;
 	
 };
 
-VectorDouble::VectorDouble()
+VectorDouble::VectorDouble() :size(1)
 {
+	
 	this->vec = new double[1];
 	vec[0] = 0;
 }
@@ -301,8 +336,24 @@ VectorDouble::VectorDouble(int size, double inicialisated_value) :size(size)
 	}
 }
 
+VectorDouble::VectorDouble(string rand_variable, int limit_size, int limit_element)
+{
+	if (rand_variable == "rand") {
+		srand(time(NULL));
+		this->size = rand() % limit_size;
+		vec = new double[this->size];
+		for (int i = 0; i < this->size; i++) {
+			this->vec[i] = rand() % limit_element;
+		}
+	}
+}
+
 VectorDouble::~VectorDouble() {
-	delete[]vec;
+	if (memory_free_variable) {
+		delete[]vec;
+	}
+	else
+		memory_free_variable = true;
 }
 
 istream& operator>>(istream& input, VectorDouble& vector) 
@@ -318,8 +369,12 @@ ostream& operator<<(ostream& output, const VectorDouble& vector)
 	for (int i = 0; i < vector.size; i++) {
 		output << vector.vec[i] << '\t';
 	}
+	output << endl;
 	return output;
 }
+
+
+
 
 /*Завдання 2. Варіанти задач. Побудувати асоційований клас збереження
 двох сутностей. В завданні створити клас, який представляє собою
@@ -332,16 +387,80 @@ ostream& operator<<(ostream& output, const VectorDouble& vector)
 введення та виведення.
 Задача 2.3. Доменних імен та ІР - адреса*/
 
+class Associated
+{
+
+public:
+
+	Associated(string domain) :Domain(domain)
+	{
+		counter++;
+		srand(Associated::counter);
+		for (int i = 0; i < 4; i++) {
+			this->IP_adress[i] = rand() % 999;
+		}
+	}
+
+
+	friend ostream& operator<<(ostream& output, Associated& thi);
+
+	static int counter;
+private:
+	string Domain;
+	short IP_adress[4];
+};
+
+int Associated::counter = 0;
+
+ostream& operator<<(ostream& output, Associated& thi) {
+	output << "Domain: " << thi.Domain << "\nIP: ";
+	for (int i = 0; i < 4; i++) {
+		output << thi.IP_adress[i] << '.';
+	}
+	return output;
+}
+
+
+
+
 
 
 void Task1()
 {
+	VectorDouble common, common_1(6), common_2(6, 4), unic(4);
+	cout << common;
+	if (common_2 > common_1) {
+		cout << "COMMON_1:\n" << common_1;
+		cout << "COMMON_2:\n" << common_2;
+	}
+	cout << "input unic vector:\n";
+	cin >> unic;
+	cout << "UNIC VECTOR:\n" << unic;
 
+	VectorDouble random_vec("rand", 10, 1616), pre_increment(5, 6.89), post_decrement(5, 4.4), temp_vec;
+	cout << "RANDOM VECTOR:" << endl << random_vec;
+	cout << "incremented vectotr: \n" << ++pre_increment;
+	temp_vec = post_decrement--;
+	cout << "decremented vectotr:\n " << post_decrement;
+
+	
+}
+
+void Task2()
+{
+	Associated feel("I love Dashulya"), duck("duckling"), cow("calf"), woolf("puppy");
+	cout << feel << endl << duck << endl << cow << endl << woolf << endl;
+
+
+	/*have to create class IP into class Associated to overload operator of inputing >>
+	it will make possible to input IP-adress to find its domain name
+	(and maybe should create class Domain too)*/
+	
 }
 
 int main()
 {
-	
+	Task1();
 
 	return 0;
 }
