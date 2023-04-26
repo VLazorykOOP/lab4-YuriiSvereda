@@ -1,5 +1,6 @@
 ﻿#include<iostream>
 #include<limits>
+#include<string>
 
 using namespace std;
 
@@ -149,7 +150,7 @@ public:
 
 	VectorDouble& operator += (const VectorDouble& other)
 	{
-		if (this->size != other.size) {
+		if (this->size < other.size) {
 			cout << "ERROR += different sizes\n";
 		}
 		else {
@@ -162,7 +163,7 @@ public:
 
 	VectorDouble& operator -= (const VectorDouble& other)
 	{		
-		if (this->size != other.size) {
+		if (this->size < other.size) {
 			cout << "ERROR += different sizes\n";
 		}
 		else {
@@ -358,6 +359,11 @@ VectorDouble::~VectorDouble() {
 
 istream& operator>>(istream& input, VectorDouble& vector) 
 {
+	if (vector.vec != nullptr)
+		delete[]vector.vec;
+	cout << "enter size: ";
+	cin >> vector.size;
+	vector.vec = new double[vector.size];
 	for (int i = 0; i < vector.size; i++) {
 		input >> vector.vec[i];
 	}
@@ -387,41 +393,207 @@ ostream& operator<<(ostream& output, const VectorDouble& vector)
 введення та виведення.
 Задача 2.3. Доменних імен та ІР - адреса*/
 
+
 class Associated
 {
 
 public:
 
-	Associated(string domain) :Domain(domain)
+	class IP
 	{
-		counter++;
-		srand(Associated::counter);
-		for (int i = 0; i < 4; i++) {
-			this->IP_adress[i] = rand() % 999;
+	public:
+		IP() {
+			counter++;
+			srand(IP::counter);
+			for (int i = 0; i < 4; i++) {
+				this->adress[i] = rand() % 999;
+			}
 		}
+
+		friend istream& operator>>(istream& input, Associated::IP& object);
+		friend ostream& operator<<(ostream& output, Associated::IP& object);
+
+		short& operator [](int index)
+		{
+			if (index < 0 || index>4) {
+				cout << "IP index error" << endl;
+				index = 0;
+			}
+			return this->adress[index];
+		}
+
+		bool operator==(const IP& other)
+		{
+			for (int i = 0; i < 4; i++) {
+				if (this->adress[i] != other.adress[i])
+					return false;
+				return true;
+			}
+		}
+
+		static int counter;
+		short adress[4];
+	};
+
+	Associated()
+	{
+		srand(time(NULL));
+		short size = 4 + rand() % 6;
+		char* generate_name;
+		generate_name = new char[size];
+		for (short i = 0; i < size; i++) {
+			if (i == size - 1) {
+				generate_name[i] = '\0';
+			}
+			else
+				generate_name[i] = 'a' + rand() % 26;
+			
+		}
+		this->Domain = generate_name;
 	}
 
+	Associated(string domain)
+	{
+		this->Domain = domain;
+	}
 
-	friend ostream& operator<<(ostream& output, Associated& thi);
+	Associated& operator = (const Associated& other) {
+		this->Domain = other.Domain;
+		this->IP_adress = other.IP_adress;
+		return *this;
+	}
 
-	static int counter;
+	string GetDomainFromIP(const IP& IPadress)
+	{
+		if (this->IP_adress == IPadress)
+			return this->Domain;
+		return "error";
+		
+	}
+
+	friend ostream& operator<<(ostream& output, Associated& object);
+
+	friend class AssociativeArr;
+
+	void PrintIP() {
+		cout << IP_adress;
+	}
+
 private:
+
 	string Domain;
-	short IP_adress[4];
+	IP IP_adress;
+	
 };
 
-int Associated::counter = 0;
 
-ostream& operator<<(ostream& output, Associated& thi) {
-	output << "Domain: " << thi.Domain << "\nIP: ";
+int Associated::IP::counter = 0;
+
+
+//operator of input and output for class ASSOCIATIVE
+ostream& operator<<(ostream& output, Associated& object) {
+	output << "Domain: " << object.Domain << "\nIP: ";
 	for (int i = 0; i < 4; i++) {
-		output << thi.IP_adress[i] << '.';
+		output << object.IP_adress[i];
+		if (i < 3)
+			output << '.';
 	}
 	return output;
 }
 
+//operator of input and output for class IP
+ostream& operator<<(ostream& output, Associated::IP& object) {
+	for (int i = 0; i < 4; i++) {
+		output << object[i];
+		if (i < 3)
+			output << '.';
+	}
+	return output;
+}
 
+istream& operator>>(istream& input, Associated::IP& object) {
+	for (int i = 0; i < 4; i++) {
+		input >> object[i];
+	}
+	return input;
+}
 
+/// <summary>
+/// ARRAY OF ASSOCIATED OBJECTS
+/// </summary>
+class AssociativeArr
+{
+public:
+	AssociativeArr(Associated initial_element) :size(1) {
+		arr = new Associated[1];
+		arr[0] = initial_element;
+	}
+	
+	AssociativeArr (const AssociativeArr& other) {
+		if (this->arr != nullptr) {
+			delete[]this->arr;
+		}
+		this->size = other.size;
+		this->arr = new Associated[other.size];
+		for (int i = 0; i < other.size; i++) {
+			this->arr[i] = other.arr[i];
+		}
+	}
+
+	Associated& operator[](Associated::IP IPkey)
+	{
+		for (int i = 0; i < this->size; i++) {
+			if (IPkey == this->arr[i].IP_adress)
+				return arr[i];
+		}
+		cout << "ERROR incorrect input of IP" << endl;
+		Associated error("ERROR of input");
+		for (int i = 0; i < 4; i++) {
+			error.IP_adress.adress[i] = -1;
+		}
+		return error;
+	}
+
+	//void push_back(Associated& new_element)
+	//{
+	//	AssociativeArr temp(*this);
+	//	delete[]this->arr;
+	//	this->arr = new Associated[size + 1];
+	//	for (int i = 0; i < this->size; i++) {
+	//		this->arr[i] = temp.arr[i];
+	//	}
+	//	this->arr[size] = new_element;
+	//	++this->size;
+	//	//cout << "CHEcking: " << endl << "temp: " << temp << endl << "this: " << *this;
+	//}
+
+	void operator()(Associated& new_element)
+	{
+		AssociativeArr temp(*this);
+		delete[]this->arr;
+		this->arr = new Associated[size + 1];
+		for (int i = 0; i < this->size; i++) {
+			this->arr[i] = temp.arr[i];
+		}
+		this->arr[size] = new_element;
+		++this->size;
+	}
+
+	friend ostream& operator<<(ostream& output, AssociativeArr& object);
+
+private:
+	Associated* arr;
+	short size;
+
+};
+
+ostream& operator<<(ostream& output, AssociativeArr& object) 
+{
+	for (int i = 0; i < object.size; i++) {
+		output << object.arr[i] << endl;
+	}
+	return output;
+}
 
 
 
@@ -443,14 +615,34 @@ void Task1()
 	temp_vec = post_decrement--;
 	cout << "decremented vectotr:\n " << post_decrement;
 
-	
+	VectorDouble a(8, 3.48), b(3, 4.6);
+	b /= 2;
+	a += b;
+	cout << "Vector A: \n" << a;
+	cout << "Vector B: \n" << b;
 }
 
 void Task2()
 {
 	Associated feel("I love Dashulya"), duck("duckling"), cow("calf"), woolf("puppy");
-	cout << feel << endl << duck << endl << cow << endl << woolf << endl;
+	
 
+	Associated arr[] = { feel, duck, cow, woolf };
+	Associated::IP desirved_ip;
+	Associated result;
+
+	AssociativeArr main_arr(feel);
+	main_arr(duck);
+	main_arr(cow);
+	main_arr(woolf);
+	cout << main_arr;
+
+
+	cout << "enter IP of diserved domain:" << endl;
+	cin >> desirved_ip;
+	result = main_arr[desirved_ip];
+	cout << result;
+	
 
 	/*have to create class IP into class Associated to overload operator of inputing >>
 	it will make possible to input IP-adress to find its domain name
@@ -460,7 +652,20 @@ void Task2()
 
 int main()
 {
-	Task1();
+	int choise;
+	cout << "choose task:\n" << "1. VectorDouble;\n" << "2. Associative class\n";
+	cin >> choise;
+	switch (choise) {
+		case 1:
+			Task1();
+			break;
+		case 2:
+			Task2();
+			break;
+		default:
+			cout << "incorrect input";
+			break;
+	}
 
 	return 0;
 }
